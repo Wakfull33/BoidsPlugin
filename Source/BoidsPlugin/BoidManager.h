@@ -46,6 +46,9 @@ public:
 	TArray<FVector> DetectionDirections;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Detection")
+	TEnumAsByte<ECollisionChannel> DetectionChannel = ECC_Visibility;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Detection")
 	int DetectionCount = 100;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Debug")

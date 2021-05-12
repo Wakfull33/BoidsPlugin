@@ -101,7 +101,7 @@ void ABoidManager::Calculate()
 				    TmpAverageFlockHeading += Boids[j]->GetActorForwardVector();;
 					TmpFlockingGroupCenter += Boids[j]->GetActorLocation();
 
-					if (ShowConnections && i == 0) {
+					if (ShowConnections /* && i == 0 */ ) {
 						DrawDebugLine(GetWorld(), Boids[i]->GetActorLocation(), Boids[j]->GetActorLocation(), FColor::Green);
 					}
 

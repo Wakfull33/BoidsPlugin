@@ -102,7 +102,7 @@ FVector ABoid::AvoidanceDirection()
 		FVector Direction = Directions[i];
 
 		FHitResult Hit;
-		GetWorld()->LineTraceSingleByChannel(Hit, GetActorLocation(), GetActorLocation() + (Direction * Manager->Settings.CollisionAvoidDistance), ECollisionChannel::ECC_Visibility);
+		GetWorld()->LineTraceSingleByChannel(Hit, GetActorLocation(), GetActorLocation() + (Direction * Manager->Settings.CollisionAvoidDistance), Manager->DetectionChannel);
 		if (Manager->ShowBoidsDetection) {
 			FColor DebugColor = Hit.bBlockingHit ? FColor::Red : FColor::Green;
 			
@@ -110,7 +110,7 @@ FVector ABoid::AvoidanceDirection()
 		}
 
 
-		if (Hit.bBlockingHit)
+		if (!Hit.bBlockingHit)
 			return Direction;
 	}
 
