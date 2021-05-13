@@ -94,7 +94,7 @@ void ABoidManager::Calculate()
 				FVector Offset = Boids[j]->GetActorLocation() - Boids[i]->GetActorLocation();
 				float SqrtDist = Offset.SizeSquared();
 
-				UE_LOG(LogTemp, Warning, TEXT("[%d] -> [%d] = %f    Perc: %f"), i, j , SqrtDist, Boids[i]->Manager->Settings.PerceptionRadius)
+				//UE_LOG(LogTemp, Warning, TEXT("[%d] -> [%d] = %f    Perc: %f"), i, j , SqrtDist, Boids[i]->Manager->Settings.PerceptionRadius)
 
 				if (SqrtDist < FMath::Pow(Boids[i]->Manager->Settings.PerceptionRadius, 2)) {
 					TmpFlockmates += 1;

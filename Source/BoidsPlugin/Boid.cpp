@@ -3,8 +3,11 @@
 
 #include "Boid.h"
 #include "Components/SphereComponent.h"
+#include "Components/StaticMeshComponent.h"
 #include "BoidManager.h"
 #include "DrawDebugHelpers.h"
+
+DEFINE_LOG_CATEGORY(BoidLog);
 
 // Sets default values
 ABoid::ABoid()
@@ -15,8 +18,14 @@ ABoid::ABoid()
 	//StaticMesh = CreateAbstractDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMesh"));
 
 	SphereComponent = CreateDefaultSubobject<USphereComponent>(TEXT("SphereCollision"));
-	SphereComponent->OnComponentBeginOverlap.AddDynamic(this, &ABoid::BeginOverlap);
-	SphereComponent->OnComponentEndOverlap.AddDynamic(this, &ABoid::EndOverlap);
+	SphereComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	SetRootComponent(SphereComponent);
+
+	Mesh = CreateDefaultSubobject<UStaticMeshComponent>(FName("Mesh"));
+	Mesh->SetCollisionProfileName(FName("Boid"));
+	Mesh->SetCollisionProfileName(FName("Boid"));
+	Mesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	Mesh->SetupAttachment(SphereComponent);
 
 
 }
@@ -37,12 +46,6 @@ void ABoid::Initialize()
 	SetActorRotation(CachedDirection.Rotation());
 
 	SphereComponent->SetSphereRadius(Manager->Settings.BoundRadius);
-
-	//StaticMesh->SetStaticMesh(Manager->BoidMesh);
-
-	//StaticMesh->SetRelativeScale3D(FVector(0.1f, 0.1f, 0.1f));
-	//StaticMesh->SetRelativeRotation(FRotator(90.0f, 0.0f, 0.0f));
-	//StaticMesh->SetRelativeLocation(FVector(0.0f, 0.0f, 0.0f));
 
 	float StartSpeed = (Manager->Settings.MinSpeed + Manager->Settings.MaxSpeed) / 2;
 	Velocity = GetActorForwardVector() * StartSpeed;
@@ -74,7 +77,13 @@ void ABoid::UpdateBoid()
 		AccelerationVect += (AlignmentForce + CohesionForce + SeparateForce);
 	}
 
-	if (IsGoingToCollide) {
+	FHitResult CollisionHit;
+	FCollisionShape SphereShape;
+	SphereShape.ShapeType = ECollisionShape::Sphere;
+	SphereShape.SetSphere(Manager->Settings.AvoidanceRadius);
+	GetWorld()->SweepSingleByChannel(CollisionHit, GetActorLocation(), GetActorLocation() + 0.01f, GetActorRotation().Quaternion(), ECC_Visibility, SphereShape);
+
+	if (CollisionHit.bBlockingHit) {
 		FVector CollisionAvoidDirection = AvoidanceDirection();
 		FVector CollisionAvoidForce = SteeringToward(CollisionAvoidDirection) * Manager->Settings.AvoidCollisionWeight;
 		AccelerationVect += CollisionAvoidForce;
@@ -122,14 +131,4 @@ FVector ABoid::SteeringToward(FVector Toward)
 	FVector Vector = Toward.GetSafeNormal() * Manager->Settings.MaxSpeed - Velocity;
 
 	return Vector.GetClampedToSize(0, Manager->Settings.MaxSteerForce);
-}
-
-void ABoid::BeginOverlap(UPrimitiveComponent* OverlapComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
-{
-	IsGoingToCollide = true;
-}
-
-void ABoid::EndOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
-{
-	IsGoingToCollide = false;
 }

@@ -7,6 +7,8 @@
 #include "BoidUtils.h"
 #include "Boid.generated.h"
 
+DECLARE_LOG_CATEGORY_EXTERN(BoidLog, Log, All);
+
 UCLASS()
 class BOIDSPLUGIN_API ABoid : public AActor
 {
@@ -65,6 +67,9 @@ public:
 	class USphereComponent* SphereComponent = nullptr;
 
 	UPROPERTY(VisibleAnywhere, Category = "Components")
+	class UStaticMeshComponent* Mesh = nullptr;
+
+	UPROPERTY(VisibleAnywhere, Category = "Components")
 	class ABoidManager* Manager = nullptr;
 
 
@@ -79,10 +84,4 @@ public:
 
 	UFUNCTION()
 	FVector SteeringToward(FVector Toward);
-
-	UFUNCTION()
-	void BeginOverlap(UPrimitiveComponent* OverlapComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
-
-	UFUNCTION()
-	void EndOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 };
